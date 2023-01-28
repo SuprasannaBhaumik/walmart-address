@@ -25,3 +25,6 @@ hs_err_pid*
 #serverless generated files
 .DS_Store
 cloudformation*.*
+/target*
+settings.json
+serverless-state.json
