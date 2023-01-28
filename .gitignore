@@ -28,3 +28,6 @@ cloudformation*.*
 /target*
 settings.json
 serverless-state.json
+.idea
+.serverless
+.vscode
