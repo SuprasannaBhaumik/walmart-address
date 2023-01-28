@@ -1,0 +1,30 @@
+Resources:
+  WalmartAddressDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName:  ${self:custom.names.dynamodb.address}
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      AttributeDefinitions:
+        - AttributeName: accountId
+          AttributeType: S
+        - AttributeName: addressId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: accountId
+          KeyType: HASH
+        - AttributeName: addressId
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+Outputs:
+  WalmartAddressDynamoDBTableArn:
+    Value: { Fn::GetAtt: [WalmartAddressDynamoDBTable, Arn]}
+    Export:
+      Name: ${self:custom.names.dynamodb.address}-table-arn
+  WalmartAddressDynamoDBTableStreamArn:
+    Value: { Fn::GetAtt: [WalmartAddressDynamoDBTable, StreamArn]}
+    Export:
+      Name: ${self:custom.names.dynamodb.address}-stream-arn

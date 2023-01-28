@@ -1,0 +1,77 @@
+service: 'walmart-address'
+
+custom:
+  names:
+    dynamodb:
+      address: ${self:service}
+  cors:
+    origin: '*'
+    headers:
+      - Access-Control-Allow-Headers
+      - Access-Control-Allow-Origin
+      - Authorization
+      - Content-Type
+      - Text
+      - X-Amz-Date
+      - X-Amz-Security-Token
+      - X-Amz-User-Agent
+      - X-Api-Key
+      - X-Customer-Id
+    allowCredentials: false
+
+provider:
+  name: aws
+  runtime: java11
+
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'ap-south-1'}
+
+  #Allows dynamodb table to be queried with action, and many more among others
+  iamRoleStatements:
+    -
+      Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:BatchGetItem
+        - dynamodb:BatchWriteItem
+      Resource:
+        - !GetAtt WalmartAddressDynamoDBTable.Arn
+
+functions:
+    get:
+      tracing: true
+      handler: com.serverless.AddressHandler::getAddresses
+      events:
+        - httpApi:
+            method: GET
+            path: /v1/{accountId}/addresses
+        - httpApi:
+            method: GET
+            path: /v1/{accountId}/address/{addressId}
+    post:
+      tracing: true
+      handler: com.serverless.addressHandler::addAddress
+      events:
+        - httpApi:
+            method: POST
+            path: /v1/{accountId}/addAddress
+    delete:
+      tracing: true
+      handler: com.serverless.addressHandler::deleteAddress
+      events:
+        - httpApi:
+            method: DELETE
+            path: /v1/delete/{accountId}/address/{addressId}
+        - httpApi:
+            method: DELETE
+            path: /v1/delete/{accountId}/address
+
+package:
+  artifact: target/walmart-${opt:stage}.jar
+
+resources:
+    - ${file(template.yml)}
