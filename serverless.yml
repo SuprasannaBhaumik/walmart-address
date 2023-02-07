@@ -1,24 +1,5 @@
 service: 'walmart-address'
 
-custom:
-  names:
-    dynamodb:
-      address: ${self:service}
-  cors:
-    origin: '*'
-    headers:
-      - Access-Control-Allow-Headers
-      - Access-Control-Allow-Origin
-      - Authorization
-      - Content-Type
-      - Text
-      - X-Amz-Date
-      - X-Amz-Security-Token
-      - X-Amz-User-Agent
-      - X-Api-Key
-      - X-Customer-Id
-    allowCredentials: false
-
 provider:
   name: aws
   runtime: java11
@@ -40,6 +21,12 @@ provider:
         - dynamodb:BatchWriteItem
       Resource:
         - !GetAtt WalmartAddressDynamoDBTable.Arn
+        - arn:aws:dynamodb:ap-south-1:425380566961:table/walmart-address/index/walmart-address-secondaryIndex
+
+custom:
+  names:
+    dynamodb:
+      address: ${self:service}
 
 functions:
     get:
@@ -54,21 +41,18 @@ functions:
             path: /v1/{accountId}/address/{addressId}
     post:
       tracing: true
-      handler: com.serverless.addressHandler::addAddress
+      handler: com.serverless.AddressHandler::addAddress
       events:
         - httpApi:
             method: POST
             path: /v1/{accountId}/addAddress
     delete:
       tracing: true
-      handler: com.serverless.addressHandler::deleteAddress
+      handler: com.serverless.AddressHandler::deleteAddress
       events:
         - httpApi:
             method: DELETE
             path: /v1/delete/{accountId}/address/{addressId}
-        - httpApi:
-            method: DELETE
-            path: /v1/delete/{accountId}/address
 
 package:
   artifact: target/walmart-${opt:stage}.jar

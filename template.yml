@@ -6,18 +6,28 @@ Resources:
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
       AttributeDefinitions:
-        - AttributeName: accountId
-          AttributeType: S
         - AttributeName: addressId
+          AttributeType: S
+        - AttributeName: accountId
           AttributeType: S
       KeySchema:
-        - AttributeName: accountId
-          KeyType: HASH
         - AttributeName: addressId
+          KeyType: HASH
+        - AttributeName: accountId
           KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
+      GlobalSecondaryIndexes:
+        - IndexName: ${self:custom.names.dynamodb.address}-secondaryIndex
+          KeySchema:
+            - AttributeName: accountId
+              KeyType: HASH
+          Projection:
+            ProjectionType: 'ALL'
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
 
 Outputs:
   WalmartAddressDynamoDBTableArn:
